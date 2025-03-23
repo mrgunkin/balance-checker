@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Network Balance Checker</title>
+    <title>Multi-Network Balance Checker V.1</title>
     <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
     <style>
         body {
@@ -46,9 +46,11 @@
             padding: 10px;
             border-radius: 5px;
             margin-top: 10px;
+            flex-direction: column;
         }
         .column {
-            width: 48%;
+            width: 100%;
+            text-align: left;
         }
         h2 {
             text-align: center;
@@ -67,14 +69,22 @@
         .small-text {
             font-size: 12px;
         }
+        .loading {
+            display: none;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Multi-Network Balance Checker</h1>
+        <h1>Multi-Network Balance Checker V.1</h1>
         <p>Check your balances across multiple blockchain networks including Ethereum, Base, BSC, Arbitrum, Optimism, Polygon, Avalanche, and more.</p>
         <textarea id="addressList" placeholder="Enter multiple addresses, one per line..."></textarea>
         <button onclick="checkMultipleBalances()">Check Balances</button>
+        <button onclick="exportToExcel()">Export to Excel</button>
+        <div class="loading" id="loading">
+            <p>Checking...</p>
+        </div>
         <div id="balances" class="result"></div>
     </div>
     
@@ -96,7 +106,8 @@
             "Arbitrum Sepolia": "https://arbitrum-sepolia-rpc.publicnode.com",
             "Optimism Sepolia": "https://optimism-sepolia-rpc.publicnode.com",
             "Polygon Amoy": "https://polygon-amoy-bor-rpc.publicnode.com",
-            "Avalanche Fuji": "https://avalanche-fuji-c-chain-rpc.publicnode.com"
+            "Avalanche Fuji": "https://avalanche-fuji-c-chain-rpc.publicnode.com",
+            "Monads Testnet": "https://testnet-rpc.monad.xyz"
         };
 
         async function getBalances(address) {
@@ -132,15 +143,14 @@
             
             mainnetResults += "</div>";
             testnetResults += "</div>";
-            
-            if (mainnetResults !== "<div class='column'><h2>Mainnets</h2></div>" || testnetResults !== "<div class='column'><h2>Testnets</h2></div>") {
-                document.getElementById("balances").innerHTML += result + `<div class='balance-container'>${mainnetResults}${testnetResults}</div>`;
-            }
+            document.getElementById("balances").innerHTML += result + `<div class='balance-container'>${mainnetResults}${testnetResults}</div>`;
+            document.getElementById("loading").style.display = "none";
         }
 
         function checkMultipleBalances() {
-            const addresses = document.getElementById('addressList').value.split('\n').map(addr => addr.trim()).filter(addr => addr);
+            document.getElementById("loading").style.display = "block";
             document.getElementById("balances").innerHTML = "";
+            const addresses = document.getElementById('addressList').value.split('\n').map(addr => addr.trim()).filter(addr => addr);
             addresses.forEach(address => getBalances(address));
         }
     </script>
