@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Network Balance Checker V.1</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background: #121212;
+            color: white;
+        }
+        .container {
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+            margin: auto;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            background: #888;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 10px;
+        }
+        button:hover {
+            background: #aaa;
+        }
+        .result {
+            text-align: left;
+            margin-top: 20px;
+        }
+        .balance-container {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .column {
+            width: 48%;
+        }
+        h2 {
+            text-align: center;
+            margin-top: 10px;
+            color: #bbb;
+            font-size: 14px;
+        }
+        textarea {
+            width: 80%;
+            height: 100px;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+        .small-text {
+            font-size: 12px;
+        }
+        .network-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .network-list {
+            width: 48%;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        /* Прогресс-бар */
+        .progress-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+        .progress-bar {
+            height: 10px;
+            width: 0%;
+            background: #4caf50;
+            border-radius: 5px;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Multi-Network Balance Checker V.1</h1>
+        <p>Check your balances across multiple Ethereum-compatible blockchains.</p>
+        
+        <div class="network-container">
+            <div class="network-list">
+                <h2>Mainnets:</h2>
+                <p>Ethereum, Base, BNB Chain, opBNB, Polygon, Arbitrum One, Arbitrum Nova, Optimism, Avalanche C-Chain, Metis, Berachain, Taiko, Fantom, Gnosis, Linea</p>
+            </div>
+            <div class="network-list">
+                <h2>Testnets:</h2>
+                <p>Ethereum Sepolia, Ethereum Holesky, Base Sepolia, BNB Chain Testnet, opBNB Testnet, Polygon Amoy, Arbitrum Sepolia, Optimism Sepolia, Avalanche Fuji, Metis Sepolia, Berachain Testnet, Taiko Hekla, Fantom Testnet, Gnosis Chiado, Linea Sepolia, Monad Testnet</p>
+            </div>
+        </div>
+
+        <textarea id="addressList" placeholder="Enter multiple addresses, one per line..."></textarea>
+        <button onclick="checkMultipleBalances()">Check Balances</button>
+        <button onclick="exportToExcel()">Export to Excel</button>
+
+        <!-- Прогресс-бар -->
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div id="balances" class="result"></div>
+    </div>
+    
+    <script>
+const networks = {
+    "Ethereum": "https://ethereum-rpc.publicnode.com",
+    "Base": "https://base-rpc.publicnode.com",
+    "BNB Chain": "https://bsc-rpc.publicnode.com",
+    "opBNB": "https://opbnb-rpc.publicnode.com",
+    "Polygon": "https://polygon-bor-rpc.publicnode.com",
+    "Arbitrum One": "https://arbitrum-one-rpc.publicnode.com",
+    "Arbitrum Nova": "https://arbitrum-nova-rpc.publicnode.com",
+    "Optimism": "https://optimism-rpc.publicnode.com",
+    "Avalanche C-Chain": "https://avalanche-c-chain-rpc.publicnode.com",
+    "Metis": "https://metis-rpc.publicnode.com:443",
+    "Berachain": "https://berachain-rpc.publicnode.com",
+    "Taiko": "https://taiko-rpc.publicnode.com",
+    "Fantom": "https://fantom-rpc.publicnode.com",
+    "Gnosis": "https://gnosis-rpc.publicnode.com",
+    "Linea": "https://linea-rpc.publicnode.com"
+};
+
+const testnetNetworks = {
+    "Ethereum Sepolia": "https://ethereum-sepolia-rpc.publicnode.com",
+    "Ethereum Holesky": "https://ethereum-holesky-rpc.publicnode.com",
+    "Base Sepolia": "https://base-sepolia-rpc.publicnode.com",
+    "BNB Chain Testnet": "https://bsc-testnet-rpc.publicnode.com",
+    "opBNB Testnet": "https://opbnb-testnet-rpc.publicnode.com",
+    "Polygon Amoy": "https://polygon-amoy-bor-rpc.publicnode.com",
+    "Arbitrum Sepolia": "https://arbitrum-sepolia-rpc.publicnode.com",
+    "Optimism Sepolia": "https://optimism-sepolia-rpc.publicnode.com",
+    "Avalanche Fuji": "https://avalanche-fuji-c-chain-rpc.publicnode.com",
+    "Metis Sepolia": "https://metis-sepolia-rpc.publicnode.com:443",
+    "Berachain Testnet": "https://berachain-testnet-rpc.publicnode.com",
+    "Taiko Hekla": "https://taiko-hekla-rpc.publicnode.com",
+    "Fantom Testnet": "https://fantom-testnet-rpc.publicnode.com",
+    "Gnosis Chiado": "https://gnosis-chiado-rpc.publicnode.com",
+    "Linea Sepolia": "https://linea-sepolia-rpc.publicnode.com",
+    "Monad Testnet": "https://testnet-rpc.monad.xyz"
+};
+async function checkBalance(address, networkName, rpcUrl) {
+    try {
+        const web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl));
+        const balance = await web3.eth.getBalance(address);
+        const balanceEth = parseFloat(web3.utils.fromWei(balance, 'ether')).toFixed(4);
+        return parseFloat(balanceEth) > 0 ? { network: networkName, balance: balanceEth } : null;
+    } catch (error) {
+        return null;
+    }
+}
+
+async function checkMultipleBalances() {
+    const addresses = document.getElementById("addressList").value.trim().split("\n").map(a => a.trim());
+    document.getElementById("balances").innerHTML = "Checking...";
+    
+    const progressContainer = document.getElementById("progressContainer");
+    const progressBar = document.getElementById("progressBar");
+    
+    progressContainer.style.display = "block";
+    progressBar.style.width = "0%";
+
+    let totalChecks = addresses.length * (Object.keys(networks).length + Object.keys(testnetNetworks).length);
+    let completedChecks = 0;
+
+    let results = "";
+    for (let address of addresses) {
+        results += `<h3>Address: ${address}</h3>`;
+        results += '<div class="balance-container">';
+        results += '<div class="column"><h2>Mainnets</h2>';
+        
+        for (let [name, url] of Object.entries(networks)) {
+            let res = await checkBalance(address, name, url);
+            if (res) results += `<p>${res.network}: ${res.balance} ETH</p>`;
+            completedChecks++;
+            progressBar.style.width = `${(completedChecks / totalChecks) * 100}%`;
+        }
+
+        results += '</div><div class="column"><h2>Testnets</h2>';
+        
+        for (let [name, url] of Object.entries(testnetNetworks)) {
+            let res = await checkBalance(address, name, url);
+            if (res) results += `<p>${res.network}: ${res.balance} ETH</p>`;
+            completedChecks++;
+            progressBar.style.width = `${(completedChecks / totalChecks) * 100}%`;
+        }
+
+        results += '</div></div>';
+    }
+    
+    document.getElementById("balances").innerHTML = results;
+    progressBar.style.width = "100%";
+}
+
+function exportToExcel() {
+    alert("Export to Excel functionality goes here.");
+}
+    </script>
+</body>
+</html>
