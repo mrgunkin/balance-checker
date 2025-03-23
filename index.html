@@ -117,20 +117,38 @@
             "Linea Sepolia": "https://linea-sepolia-rpc.publicnode.com",
             "Monads Testnet": "https://testnet-rpc.monad.xyz"
         };
-        
-        function exportToExcel() {
-            let table = [["Address", "Network", "Balance"]];
-            document.querySelectorAll(".balance-container").forEach(container => {
-                container.querySelectorAll(".column p").forEach(p => {
-                    let [network, balance] = p.innerText.split(": ");
-                    let address = container.previousElementSibling.innerText.replace("Address: ", "");
-                    table.push([address, network, balance]);
-                });
-            });
-            let wb = XLSX.utils.book_new();
-            let ws = XLSX.utils.aoa_to_sheet(table);
-            XLSX.utils.book_append_sheet(wb, ws, "Balances");
-            XLSX.writeFile(wb, "balances.xlsx");
+
+        async function checkBalance(address, networkName, rpcUrl) {
+            try {
+                const web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl));
+                const balance = await web3.eth.getBalance(address);
+                return { network: networkName, balance: web3.utils.fromWei(balance, 'ether') };
+            } catch (error) {
+                return { network: networkName, balance: 'Error' };
+            }
+        }
+
+        async function checkMultipleBalances() {
+            const addresses = document.getElementById("addressList").value.trim().split("\n").map(a => a.trim());
+            document.getElementById("balances").innerHTML = "Checking...";
+            
+            let results = "";
+            for (let address of addresses) {
+                results += `<h3>Address: ${address}</h3>`;
+                results += '<div class="balance-container">';
+                results += '<div class="column">';
+                for (let [name, url] of Object.entries(networks)) {
+                    let res = await checkBalance(address, name, url);
+                    results += `<p>${res.network}: ${res.balance} ETH</p>`;
+                }
+                results += '</div><div class="column">';
+                for (let [name, url] of Object.entries(testnetNetworks)) {
+                    let res = await checkBalance(address, name, url);
+                    results += `<p>${res.network}: ${res.balance} ETH</p>`;
+                }
+                results += '</div></div>';
+            }
+            document.getElementById("balances").innerHTML = results;
         }
     </script>
 </body>
