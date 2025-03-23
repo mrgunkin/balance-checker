@@ -6,21 +6,55 @@
     <title>Testnet Balance Checker</title>
     <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
-        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
-        #balances { margin-top: 20px; }
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: auto;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #balances {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .balance-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+        }
     </style>
 </head>
 <body>
-    <h1>Testnet Balance Checker</h1>
-    <button onclick="connectWallet()">Connect MetaMask</button>
-    <div id="status"></div>
-    <div id="balances"></div>
-
+    <div class="container">
+        <h1>Testnet Balance Checker</h1>
+        <p>Connect your MetaMask wallet and check your balances on multiple Ethereum testnets.</p>
+        <button onclick="connectWallet()">Connect MetaMask</button>
+        <div id="status"></div>
+        <div id="balances"></div>
+    </div>
+    
     <script>
         const networks = {
-            "ethereum-sepolia": "https://sepolia.infura.io/v3/YOUR_INFURA_PROJECT_ID",
-            "ethereum-holesky": "https://holesky.infura.io/v3/YOUR_INFURA_PROJECT_ID",
+            "ethereum-sepolia": "https://rpc.sepolia.org",
+            "ethereum-holesky": "https://ethereum-holesky.publicnode.com",
             "base-sepolia": "https://sepolia.base.org",
             "optimism-sepolia": "https://sepolia.optimism.io",
             "arbitrum-sepolia": "https://sepolia-rollup.arbitrum.io/rpc",
@@ -51,10 +85,10 @@
                 try {
                     const web3 = new Web3(rpcUrl);
                     const balance = await web3.eth.getBalance(address);
-                    const ethBalance = web3.utils.fromWei(balance, 'ether');
-                    balancesDiv.innerHTML += `<p><strong>${networkName}:</strong> ${ethBalance} ETH</p>`;
+                    const ethBalance = parseFloat(web3.utils.fromWei(balance, 'ether')).toFixed(4);
+                    balancesDiv.innerHTML += `<p class='balance-entry'><strong>${networkName}:</strong> ${ethBalance} ETH</p>`;
                 } catch (error) {
-                    balancesDiv.innerHTML += `<p><strong>${networkName}:</strong> Error fetching balance</p>`;
+                    balancesDiv.innerHTML += `<p class='balance-entry'><strong>${networkName}:</strong> Error fetching balance</p>`;
                 }
             }
         }
