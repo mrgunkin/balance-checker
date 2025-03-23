@@ -6,7 +6,8 @@
 
 ## English
 
-Multi-Network Balance Checker V.1 allows you to check balances across multiple Ethereum-compatible blockchains, including mainnets and testnets. 
+[Multi-Network Balance Checker V.1](https://mrgunkin.github.io/balance-checker/) allows you to check balances across multiple Ethereum-compatible blockchains, including mainnets and testnets. 
+
 
 ### Features:
 - ✅ Supports Ethereum, BNB Chain, Polygon, Arbitrum, Optimism, Avalanche, and more.
@@ -27,7 +28,7 @@ Multi-Network Balance Checker V.1 allows you to check balances across multiple E
 
 ## Русский
 
-Multi-Network Balance Checker V.1 позволяет проверять балансы на различных блокчейнах, совместимых с Ethereum, включая основные сети и тестовые сети.
+[Multi-Network Balance Checker V.1](https://mrgunkin.github.io/balance-checker/) позволяет проверять балансы на различных блокчейнах, совместимых с Ethereum, включая основные сети и тестовые сети.
 
 ### Возможности:
 - ✅ Поддерживает Ethereum, BNB Chain, Polygon, Arbitrum, Optimism, Avalanche и другие.
