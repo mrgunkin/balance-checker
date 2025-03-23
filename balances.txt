@@ -1,1 +1,9 @@
-
+Address: 0x6cE2ea31b3Bc8F2E16885374EC3Dbd33B52Db8De
+  ethereum-sepolia: 10 ETH
+  ethereum-holesky: 0.184 ETH
+  base-sepolia: 0 ETH
+  optimism-sepolia: 0 ETH
+  arbitrum-sepolia: 0 ETH
+  polygon-amoy: 0 ETH
+  bnb-testnet: 8 ETH
+-
