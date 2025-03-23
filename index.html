@@ -10,7 +10,7 @@
             font-family: Arial, sans-serif;
             text-align: center;
             margin: 50px;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            background: #121212;
             color: white;
         }
         .container {
@@ -18,7 +18,7 @@
             background: rgba(255, 255, 255, 0.1);
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
             margin: auto;
         }
         button {
@@ -30,6 +30,7 @@
             border: none;
             border-radius: 5px;
             font-weight: bold;
+            margin: 10px;
         }
         button:hover {
             background: #ffdd44;
@@ -60,8 +61,8 @@
 <body>
     <div class="container">
         <h1>Multi-Network Balance Checker</h1>
-        <p>Connect your MetaMask wallet to check balances across multiple blockchain networks.</p>
-        <button onclick="connectWallet()">Connect MetaMask</button>
+        <p>Check your balances across multiple blockchain networks including Ethereum, Base, BSC, Arbitrum, Optimism, Polygon, Avalanche, and more.</p>
+        <button onclick="connectWallet()" id="connectButton">Connect MetaMask</button>
         <div id="status"></div>
         <div id="balances">
             <div class="balance-column">
@@ -76,71 +77,29 @@
     </div>
     
     <script>
-        const mainnetNetworks = {
-            "Ethereum Mainnet": "https://ethereum-rpc.publicnode.com",
-            "Base Mainnet": "https://base-rpc.publicnode.com",
-            "BSC Mainnet": "https://bsc-rpc.publicnode.com",
-            "opBNB Mainnet": "https://opbnb-rpc.publicnode.com",
-            "Polygon Mainnet": "https://polygon-bor-rpc.publicnode.com",
-            "Arbitrum One": "https://arbitrum-one-rpc.publicnode.com",
-            "Arbitrum Nova": "https://arbitrum-nova-rpc.publicnode.com",
-            "Optimism Mainnet": "https://optimism-rpc.publicnode.com",
-            "Avalanche C-Chain": "https://avalanche-c-chain-rpc.publicnode.com",
-            "Metis Mainnet": "https://metis-rpc.publicnode.com:443",
-            "Berachain Mainnet": "https://berachain-rpc.publicnode.com",
-            "Taiko Mainnet": "https://taiko-rpc.publicnode.com",
-            "Fantom Mainnet": "https://fantom-rpc.publicnode.com",
-            "Gnosis Mainnet": "https://gnosis-rpc.publicnode.com",
-            "Linea Mainnet": "https://linea-rpc.publicnode.com"
-        };
-
-        const testnetNetworks = {
-            "Ethereum Sepolia": "https://ethereum-sepolia-rpc.publicnode.com",
-            "Ethereum Holesky": "https://ethereum-holesky-rpc.publicnode.com",
-            "Base Sepolia": "https://base-sepolia-rpc.publicnode.com",
-            "BSC Testnet": "https://bsc-testnet-rpc.publicnode.com",
-            "opBNB Testnet": "https://opbnb-testnet-rpc.publicnode.com",
-            "Polygon Amoy": "https://polygon-amoy-bor-rpc.publicnode.com",
-            "Arbitrum Sepolia": "https://arbitrum-sepolia-rpc.publicnode.com",
-            "Optimism Sepolia": "https://optimism-sepolia-rpc.publicnode.com",
-            "Avalanche Fuji": "https://avalanche-fuji-c-chain-rpc.publicnode.com",
-            "Metis Sepolia": "https://metis-sepolia-rpc.publicnode.com:443",
-            "Berachain Testnet": "https://berachain-testnet-rpc.publicnode.com",
-            "Taiko Hekla": "https://taiko-hekla-rpc.publicnode.com",
-            "Fantom Testnet": "https://fantom-testnet-rpc.publicnode.com",
-            "Gnosis Chiado": "https://gnosis-chiado-rpc.publicnode.com",
-            "Linea Sepolia": "https://linea-sepolia-rpc.publicnode.com"
-        };
-
+        let connectedAccount = null;
+        
         async function connectWallet() {
             if (window.ethereum && window.ethereum.isMetaMask) {
                 try {
+                    if (connectedAccount) {
+                        connectedAccount = null;
+                        document.getElementById('status').innerText = 'Disconnected';
+                        document.getElementById('connectButton').innerText = 'Connect MetaMask';
+                        return;
+                    }
+                    
                     const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-                    const userAddress = accounts[0];
-                    document.getElementById('status').innerText = `Connected: ${userAddress}`;
-                    getBalances(userAddress, mainnetNetworks, "mainnet-balances");
-                    getBalances(userAddress, testnetNetworks, "testnet-balances");
+                    connectedAccount = accounts[0];
+                    document.getElementById('status').innerText = `Connected: ${connectedAccount}`;
+                    document.getElementById('connectButton').innerText = 'Disconnect';
+                    getBalances(connectedAccount, mainnetNetworks, "mainnet-balances");
+                    getBalances(connectedAccount, testnetNetworks, "testnet-balances");
                 } catch (error) {
                     document.getElementById('status').innerText = `Error: ${error.message}`;
                 }
             } else {
                 document.getElementById('status').innerText = 'MetaMask not detected!';
-            }
-        }
-
-        async function getBalances(address, networks, elementId) {
-            const balancesDiv = document.getElementById(elementId);
-            balancesDiv.innerHTML = '';
-
-            for (const [networkName, rpcUrl] of Object.entries(networks)) {
-                try {
-                    const web3 = new Web3(rpcUrl);
-                    const balance = await web3.eth.getBalance(address);
-                    const ethBalance = parseFloat(web3.utils.fromWei(balance, 'ether')).toFixed(4);
-                    balancesDiv.innerHTML += `<p class='balance-entry'><strong>${networkName}:</strong> ${ethBalance} ETH</p>`;
-                } catch (error) {
-                    balancesDiv.innerHTML += `<p class='balance-entry'><strong>${networkName}:</strong> Error fetching balance</p>`;
-                }
             }
         }
     </script>
