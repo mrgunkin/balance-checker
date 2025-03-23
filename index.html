@@ -123,6 +123,20 @@
             "Linea Sepolia": "https://linea-sepolia-rpc.publicnode.com"
         };
 
+        async function getBalances(address, networks, elementId) {
+            const container = document.getElementById(elementId);
+            for (const [network, rpc] of Object.entries(networks)) {
+                try {
+                    const web3 = new Web3(new Web3.providers.HttpProvider(rpc));
+                    const balance = await web3.eth.getBalance(address);
+                    const ethBalance = parseFloat(web3.utils.fromWei(balance, "ether")).toFixed(4);
+                    container.innerHTML += `<div class='balance-entry'>${network}: ${ethBalance} ETH</div>`;
+                } catch (error) {
+                    container.innerHTML += `<div class='balance-entry'>${network}: Error fetching balance</div>`;
+                }
+            }
+        }
+
         function checkMultipleBalances() {
             const addresses = document.getElementById('addressList').value.split('\n').map(addr => addr.trim()).filter(addr => addr);
             document.getElementById('mainnet-balances').innerHTML = "";
