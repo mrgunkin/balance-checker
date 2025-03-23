@@ -35,18 +35,9 @@
         button:hover {
             background: #aaa;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            padding: 10px;
+        .result {
             text-align: left;
-        }
-        th {
-            background: rgba(255, 255, 255, 0.2);
+            margin-top: 20px;
         }
         h2 {
             text-align: center;
@@ -69,42 +60,18 @@
         <p>Check your balances across multiple blockchain networks including Ethereum, Base, BSC, Arbitrum, Optimism, Polygon, Avalanche, and more.</p>
         <textarea id="addressList" placeholder="Enter multiple addresses, one per line..."></textarea>
         <button onclick="checkMultipleBalances()">Check Balances</button>
-        <h2>Mainnet Balances</h2>
-        <table id="mainnet-balances">
-            <thead>
-                <tr>
-                    <th>Address</th>
-                    <th>Network</th>
-                    <th>Balance (ETH)</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-        <h2>Testnet Balances</h2>
-        <table id="testnet-balances">
-            <thead>
-                <tr>
-                    <th>Address</th>
-                    <th>Network</th>
-                    <th>Balance (ETH)</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <div id="balances" class="result"></div>
     </div>
     
     <script>
-        const mainnetNetworks = {
+        const networks = {
             "Ethereum": "https://ethereum-rpc.publicnode.com",
             "Base": "https://base-rpc.publicnode.com",
             "BSC": "https://bsc-rpc.publicnode.com",
             "Arbitrum One": "https://arbitrum-one-rpc.publicnode.com",
             "Optimism": "https://optimism-rpc.publicnode.com",
             "Polygon": "https://polygon-bor-rpc.publicnode.com",
-            "Avalanche": "https://avalanche-c-chain-rpc.publicnode.com"
-        };
-        
-        const testnetNetworks = {
+            "Avalanche": "https://avalanche-c-chain-rpc.publicnode.com",
             "Ethereum Sepolia": "https://ethereum-sepolia-rpc.publicnode.com",
             "Base Sepolia": "https://base-sepolia-rpc.publicnode.com",
             "BSC Testnet": "https://bsc-testnet-rpc.publicnode.com",
@@ -114,31 +81,27 @@
             "Avalanche Fuji": "https://avalanche-fuji-c-chain-rpc.publicnode.com"
         };
 
-        async function getBalances(address, networks, tableId) {
-            const tableBody = document.querySelector(`#${tableId} tbody`);
+        async function getBalances(address) {
+            let result = `<h3>${address.slice(0, 6)}...${address.slice(-4)}</h3>`;
             for (const [network, rpc] of Object.entries(networks)) {
                 try {
                     const web3 = new Web3(new Web3.providers.HttpProvider(rpc));
                     const balance = await web3.eth.getBalance(address);
                     const ethBalance = parseFloat(web3.utils.fromWei(balance, "ether")).toFixed(4);
                     if (ethBalance > 0) {
-                        const row = `<tr><td>${address.slice(0, 6)}...${address.slice(-4)}</td><td>${network}</td><td>${ethBalance}</td></tr>`;
-                        tableBody.innerHTML += row;
+                        result += `<p><strong>${network}:</strong> ${ethBalance} ETH</p>`;
                     }
                 } catch (error) {
                     console.error(`Error fetching balance for ${network}:`, error);
                 }
             }
+            document.getElementById("balances").innerHTML += result;
         }
 
         function checkMultipleBalances() {
             const addresses = document.getElementById('addressList').value.split('\n').map(addr => addr.trim()).filter(addr => addr);
-            document.querySelector('#mainnet-balances tbody').innerHTML = "";
-            document.querySelector('#testnet-balances tbody').innerHTML = "";
-            addresses.forEach(address => {
-                getBalances(address, mainnetNetworks, "mainnet-balances");
-                getBalances(address, testnetNetworks, "testnet-balances");
-            });
+            document.getElementById("balances").innerHTML = "";
+            addresses.forEach(address => getBalances(address));
         }
     </script>
 </body>
