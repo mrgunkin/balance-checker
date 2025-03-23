@@ -38,6 +38,11 @@
         .result {
             text-align: left;
             margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .column {
+            width: 48%;
         }
         h2 {
             text-align: center;
@@ -51,6 +56,9 @@
             padding: 10px;
             border-radius: 5px;
             border: none;
+        }
+        .small-text {
+            font-size: 14px;
         }
     </style>
 </head>
@@ -71,7 +79,10 @@
             "Arbitrum One": "https://arbitrum-one-rpc.publicnode.com",
             "Optimism": "https://optimism-rpc.publicnode.com",
             "Polygon": "https://polygon-bor-rpc.publicnode.com",
-            "Avalanche": "https://avalanche-c-chain-rpc.publicnode.com",
+            "Avalanche": "https://avalanche-c-chain-rpc.publicnode.com"
+        };
+        
+        const testnetNetworks = {
             "Ethereum Sepolia": "https://ethereum-sepolia-rpc.publicnode.com",
             "Base Sepolia": "https://base-sepolia-rpc.publicnode.com",
             "BSC Testnet": "https://bsc-testnet-rpc.publicnode.com",
@@ -82,20 +93,40 @@
         };
 
         async function getBalances(address) {
-            let result = `<h3>${address.slice(0, 6)}...${address.slice(-4)}</h3>`;
+            let result = `<h3>Checking... ${address.slice(0, 6)}...${address.slice(-4)}</h3>`;
+            let mainnetResults = "<div class='column'><h2>Mainnets</h2>";
+            let testnetResults = "<div class='column'><h2>Testnets</h2>";
+            
             for (const [network, rpc] of Object.entries(networks)) {
                 try {
                     const web3 = new Web3(new Web3.providers.HttpProvider(rpc));
                     const balance = await web3.eth.getBalance(address);
                     const ethBalance = parseFloat(web3.utils.fromWei(balance, "ether")).toFixed(4);
                     if (ethBalance > 0) {
-                        result += `<p><strong>${network}:</strong> ${ethBalance} ETH</p>`;
+                        mainnetResults += `<p class='small-text'><strong>${network}:</strong> ${ethBalance} ETH</p>`;
                     }
                 } catch (error) {
                     console.error(`Error fetching balance for ${network}:`, error);
                 }
             }
-            document.getElementById("balances").innerHTML += result;
+
+            for (const [network, rpc] of Object.entries(testnetNetworks)) {
+                try {
+                    const web3 = new Web3(new Web3.providers.HttpProvider(rpc));
+                    const balance = await web3.eth.getBalance(address);
+                    const ethBalance = parseFloat(web3.utils.fromWei(balance, "ether")).toFixed(4);
+                    if (ethBalance > 0) {
+                        testnetResults += `<p class='small-text'><strong>${network}:</strong> ${ethBalance} ETH</p>`;
+                    }
+                } catch (error) {
+                    console.error(`Error fetching balance for ${network}:`, error);
+                }
+            }
+            
+            mainnetResults += "</div>";
+            testnetResults += "</div>";
+            
+            document.getElementById("balances").innerHTML += result + `<div class='result'>${mainnetResults}${testnetResults}</div>`;
         }
 
         function checkMultipleBalances() {
