@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testnet Balance Checker</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+        #balances { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Testnet Balance Checker</h1>
+    <button onclick="connectWallet()">Connect MetaMask</button>
+    <div id="status"></div>
+    <div id="balances"></div>
+
+    <script>
+        const networks = {
+            "ethereum-sepolia": "0xaa36a7",
+            "ethereum-holesky": "0x100000017",
+            "base-sepolia": "0x14a33",
+            "optimism-sepolia": "0x1a4",
+            "arbitrum-sepolia": "0x66eee",
+            "polygon-amoy": "0x13882",
+            "bnb-testnet": "0x61"
+        };
+
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                    const userAddress = accounts[0];
+                    document.getElementById('status').innerText = `Connected: ${userAddress}`;
+                    getBalances(userAddress);
+                } catch (error) {
+                    document.getElementById('status').innerText = `Error: ${error.message}`;
+                }
+            } else {
+                document.getElementById('status').innerText = 'MetaMask not detected!';
+            }
+        }
+
+        async function getBalances(address) {
+            const balancesDiv = document.getElementById('balances');
+            balancesDiv.innerHTML = '<h2>Balances:</h2>';
+
+            for (const [networkName, chainId] of Object.entries(networks)) {
+                try {
+                    const web3 = new Web3(`https://rpc.ankr.com/${networkName}`);
+                    const balance = await web3.eth.getBalance(address);
+                    const ethBalance = web3.utils.fromWei(balance, 'ether');
+                    balancesDiv.innerHTML += `<p><strong>${networkName}:</strong> ${ethBalance} ETH</p>`;
+                } catch (error) {
+                    balancesDiv.innerHTML += `<p><strong>${networkName}:</strong> Error fetching balance</p>`;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
