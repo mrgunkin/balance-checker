@@ -48,7 +48,7 @@
 <body>
     <div class="container">
         <h1>Multi-Network Balance Checker</h1>
-        <p>Connect your MetaMask wallet and check your balances across multiple blockchain networks (Ethereum, Base, BSC, Polygon, Arbitrum, Optimism, Avalanche, Metis, Berachain, Taiko, Fantom, Gnosis, Linea, Sui).</p>
+        <p>Connect your MetaMask wallet and check your balances across multiple blockchain networks (Ethereum, Base, BSC, Polygon, Arbitrum, Optimism, Avalanche, Metis, Berachain, Taiko, Fantom, Gnosis, Linea).</p>
         <button onclick="connectWallet()">Connect MetaMask</button>
         <div id="status"></div>
         <h2>Mainnet Balances</h2>
@@ -73,8 +73,7 @@
             "Taiko Mainnet": "https://taiko-rpc.publicnode.com",
             "Fantom Mainnet": "https://fantom-rpc.publicnode.com",
             "Gnosis Mainnet": "https://gnosis-rpc.publicnode.com",
-            "Linea Mainnet": "https://linea-rpc.publicnode.com",
-            "Sui Mainnet": "https://sui-rpc.publicnode.com"
+            "Linea Mainnet": "https://linea-rpc.publicnode.com"
         };
 
         const testnetNetworks = {
@@ -92,8 +91,7 @@
             "Taiko Hekla": "https://taiko-hekla-rpc.publicnode.com",
             "Fantom Testnet": "https://fantom-testnet-rpc.publicnode.com",
             "Gnosis Chiado": "https://gnosis-chiado-rpc.publicnode.com",
-            "Linea Sepolia": "https://linea-sepolia-rpc.publicnode.com",
-            "Sui Testnet": "https://sui-testnet-rpc.publicnode.com"
+            "Linea Sepolia": "https://linea-sepolia-rpc.publicnode.com"
         };
 
         async function connectWallet() {
