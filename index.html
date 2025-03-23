@@ -25,15 +25,15 @@
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
-            background: #ffcc00;
-            color: #333;
+            background: #888;
+            color: #fff;
             border: none;
             border-radius: 5px;
             font-weight: bold;
             margin: 10px;
         }
         button:hover {
-            background: #ffdd44;
+            background: #aaa;
         }
         #balances {
             margin-top: 20px;
@@ -54,7 +54,7 @@
         h2 {
             text-align: center;
             margin-top: 20px;
-            color: #ffcc00;
+            color: #bbb;
         }
     </style>
 </head>
@@ -78,6 +78,16 @@
     
     <script>
         let connectedAccount = null;
+        const mainnetNetworks = {
+            "Ethereum": "https://ethereum-rpc.publicnode.com",
+            "Base": "https://base-rpc.publicnode.com",
+            "BSC": "https://bsc-rpc.publicnode.com"
+        };
+        const testnetNetworks = {
+            "Ethereum Sepolia": "https://ethereum-sepolia-rpc.publicnode.com",
+            "Base Sepolia": "https://base-sepolia-rpc.publicnode.com",
+            "BSC Testnet": "https://bsc-testnet-rpc.publicnode.com"
+        };
         
         async function connectWallet() {
             if (window.ethereum && window.ethereum.isMetaMask) {
@@ -100,6 +110,21 @@
                 }
             } else {
                 document.getElementById('status').innerText = 'MetaMask not detected!';
+            }
+        }
+
+        async function getBalances(account, networks, elementId) {
+            const container = document.getElementById(elementId);
+            container.innerHTML = "";
+            for (const [name, rpc] of Object.entries(networks)) {
+                try {
+                    const web3 = new Web3(new Web3.providers.HttpProvider(rpc));
+                    const balance = await web3.eth.getBalance(account);
+                    const formattedBalance = (parseFloat(web3.utils.fromWei(balance, 'ether'))).toFixed(4);
+                    container.innerHTML += `<div class='balance-entry'><strong>${name}:</strong> ${formattedBalance} ETH</div>`;
+                } catch (error) {
+                    container.innerHTML += `<div class='balance-entry'><strong>${name}:</strong> Error fetching balance</div>`;
+                }
             }
         }
     </script>
