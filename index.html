@@ -10,51 +10,69 @@
             font-family: Arial, sans-serif;
             text-align: center;
             margin: 50px;
-            background-color: #f4f4f4;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
         }
         .container {
-            max-width: 600px;
-            background: white;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.1);
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
             margin: auto;
         }
         button {
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
-            background: #007bff;
-            color: white;
+            background: #ffcc00;
+            color: #333;
             border: none;
             border-radius: 5px;
+            font-weight: bold;
         }
         button:hover {
-            background: #0056b3;
+            background: #ffdd44;
         }
         #balances {
             margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
             text-align: left;
+        }
+        .balance-column {
+            width: 45%;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 8px;
         }
         .balance-entry {
             padding: 5px 0;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
         }
         h2 {
+            text-align: center;
             margin-top: 20px;
+            color: #ffcc00;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Multi-Network Balance Checker</h1>
-        <p>Connect your MetaMask wallet and check your balances across multiple blockchain networks (Ethereum, Base, BSC, Polygon, Arbitrum, Optimism, Avalanche, Metis, Berachain, Taiko, Fantom, Gnosis, Linea).</p>
+        <p>Connect your MetaMask wallet to check balances across multiple blockchain networks.</p>
         <button onclick="connectWallet()">Connect MetaMask</button>
         <div id="status"></div>
-        <h2>Mainnet Balances</h2>
-        <div id="mainnet-balances"></div>
-        <h2>Testnet Balances</h2>
-        <div id="testnet-balances"></div>
+        <div id="balances">
+            <div class="balance-column">
+                <h2>Mainnet Balances</h2>
+                <div id="mainnet-balances"></div>
+            </div>
+            <div class="balance-column">
+                <h2>Testnet Balances</h2>
+                <div id="testnet-balances"></div>
+            </div>
+        </div>
     </div>
     
     <script>
