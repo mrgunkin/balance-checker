@@ -70,8 +70,6 @@
     <div class="container">
         <h1>Multi-Network Balance Checker</h1>
         <p>Check your balances across multiple blockchain networks including Ethereum, Base, BSC, Arbitrum, Optimism, Polygon, Avalanche, and more.</p>
-        <button onclick="connectWallet()" id="connectButton">Connect MetaMask</button>
-        <div id="status"></div>
         <textarea id="addressList" placeholder="Enter multiple addresses, one per line..."></textarea>
         <button onclick="checkMultipleBalances()">Check Balances</button>
         <div id="balances">
@@ -87,7 +85,6 @@
     </div>
     
     <script>
-        let connectedAccount = null;
         const mainnetNetworks = {
             "Ethereum": "https://ethereum-rpc.publicnode.com",
             "Base": "https://base-rpc.publicnode.com",
@@ -125,6 +122,8 @@
 
         async function getBalances(address, networks, elementId) {
             const container = document.getElementById(elementId);
+            const addressHeader = `<h3>${address}</h3>`;
+            container.innerHTML += addressHeader;
             for (const [network, rpc] of Object.entries(networks)) {
                 try {
                     const web3 = new Web3(new Web3.providers.HttpProvider(rpc));
