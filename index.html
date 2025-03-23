@@ -56,6 +56,14 @@
             margin-top: 20px;
             color: #bbb;
         }
+        textarea {
+            width: 80%;
+            height: 100px;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+        }
     </style>
 </head>
 <body>
@@ -64,6 +72,8 @@
         <p>Check your balances across multiple blockchain networks including Ethereum, Base, BSC, Arbitrum, Optimism, Polygon, Avalanche, and more.</p>
         <button onclick="connectWallet()" id="connectButton">Connect MetaMask</button>
         <div id="status"></div>
+        <textarea id="addressList" placeholder="Enter multiple addresses, one per line..."></textarea>
+        <button onclick="checkMultipleBalances()">Check Balances</button>
         <div id="balances">
             <div class="balance-column">
                 <h2>Mainnet Balances</h2>
@@ -112,44 +122,15 @@
             "Gnosis Chiado": "https://gnosis-chiado-rpc.publicnode.com",
             "Linea Sepolia": "https://linea-sepolia-rpc.publicnode.com"
         };
-        
-        async function connectWallet() {
-            if (window.ethereum && window.ethereum.isMetaMask) {
-                try {
-                    if (connectedAccount) {
-                        connectedAccount = null;
-                        document.getElementById('status').innerText = 'Disconnected';
-                        document.getElementById('connectButton').innerText = 'Connect MetaMask';
-                        return;
-                    }
-                    
-                    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-                    connectedAccount = accounts[0];
-                    document.getElementById('status').innerText = `Connected: ${connectedAccount}`;
-                    document.getElementById('connectButton').innerText = 'Disconnect';
-                    getBalances(connectedAccount, mainnetNetworks, "mainnet-balances");
-                    getBalances(connectedAccount, testnetNetworks, "testnet-balances");
-                } catch (error) {
-                    document.getElementById('status').innerText = `Error: ${error.message}`;
-                }
-            } else {
-                document.getElementById('status').innerText = 'MetaMask not detected!';
-            }
-        }
 
-        async function getBalances(account, networks, elementId) {
-            const container = document.getElementById(elementId);
-            container.innerHTML = "";
-            for (const [name, rpc] of Object.entries(networks)) {
-                try {
-                    const web3 = new Web3(new Web3.providers.HttpProvider(rpc));
-                    const balance = await web3.eth.getBalance(account);
-                    const formattedBalance = (parseFloat(web3.utils.fromWei(balance, 'ether'))).toFixed(4);
-                    container.innerHTML += `<div class='balance-entry'><strong>${name}:</strong> ${formattedBalance} ETH</div>`;
-                } catch (error) {
-                    container.innerHTML += `<div class='balance-entry'><strong>${name}:</strong> Error fetching balance</div>`;
-                }
-            }
+        function checkMultipleBalances() {
+            const addresses = document.getElementById('addressList').value.split('\n').map(addr => addr.trim()).filter(addr => addr);
+            document.getElementById('mainnet-balances').innerHTML = "";
+            document.getElementById('testnet-balances').innerHTML = "";
+            addresses.forEach(address => {
+                getBalances(address, mainnetNetworks, "mainnet-balances");
+                getBalances(address, testnetNetworks, "testnet-balances");
+            });
         }
     </script>
 </body>
