@@ -1,2 +1,10 @@
-# testnet-balance-checker
-Testnet balances mass checker
+Как использовать:
+
+Установите зависимости:
+pip install web3
+
+Создайте файл addresses.txt и добавьте туда адреса кошельков, каждый с новой строки.
+
+Замените YOUR_INFURA_API_KEY на ваш API-ключ Infura (или используйте другие RPC-сервисы).
+
+Запустите скрипт, и он создаст balances.txt с результатами.
