@@ -138,17 +138,18 @@ const testnetNetworks = {
             for (let address of addresses) {
                 results += `<h3>Address: ${address}</h3>`;
                 results += '<div class="balance-container">';
-                results += '<div class="column">';
-                for (let [name, url] of Object.entries(networks)) {
-                    let res = await checkBalance(address, name, url);
-                    if (res) results += `<p>${res.network}: ${res.balance} ETH</p>`;
-                }
-                results += '</div><div class="column">';
-                for (let [name, url] of Object.entries(testnetNetworks)) {
-                    let res = await checkBalance(address, name, url);
-                    if (res) results += `<p>${res.network}: ${res.balance} ETH</p>`;
-                }
-                results += '</div></div>';
+results += '<div class="column"><h2>Mainnets</h2>';
+for (let [name, url] of Object.entries(networks)) {
+    let res = await checkBalance(address, name, url);
+    if (res) results += `<p>${res.network}: ${res.balance} ETH</p>`;
+}
+results += '</div><div class="column"><h2>Testnets</h2>';
+for (let [name, url] of Object.entries(testnetNetworks)) {
+    let res = await checkBalance(address, name, url);
+    if (res) results += `<p>${res.network}: ${res.balance} ETH</p>`;
+}
+results += '</div></div>';
+
             }
             document.getElementById("balances").innerHTML = results;
         }
